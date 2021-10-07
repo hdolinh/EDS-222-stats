@@ -1,6 +1,6 @@
 ---
 title: "EDS 222: Week 3: In-class Lab"
-author: "{STUDENT NAME}"
+author: "Halina Do-Linh"
 date: "`r Sys.Date()`"
 output:
   tufte::tufte_html: default
@@ -36,14 +36,15 @@ library(gt)
 library(openintro)
 library(ggplot2)
 library(modelr)
+library(here)
 
 options(scipen = 999) # disable scientific notation
 
 # Set your file path here! Or, set this up as an .Rproj if you'd like.
-rootdir <- ("~/Dropbox/Teaching/UCSB/EDS_222/EDS222_data")
+rootdir <- here::here("labs", "_common.R")
 
 # This runs the script _common.R, which loads all the packages we'll need for today and does some extra stuff we won't really use, at least for now.
-source(file.path(rootdir,"labs","_common.R"))
+source(rootdir)
 
 # For labs, we want to see all our code
 knitr::opts_chunk$set(echo = TRUE)
