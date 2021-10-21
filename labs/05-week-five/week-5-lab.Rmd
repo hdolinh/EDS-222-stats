@@ -73,6 +73,8 @@ mpg %>%
 
 These slopes being **parallel** comes from our regression equation having just one coefficient on engine size; regardless of your vintage, we estimate the same impact of engine size on fuel economy.
 
+**Big Idea:** Should these lines be parallel? Should the slopes look different?
+
 This may not be accurate. If technology is improving over time, the effect of engine size on fuel economy could decline over time -- having a larger engine lowers fuel economy, but maybe we are getting better at not sacrificing miles per gallon as we increase engine size. In this subsection, we want to see if this true or or not. We will use the `mpg` dataset and is pre-loaded in `R`.
 
 ## Interaction model
@@ -86,17 +88,49 @@ Complete the following:
 1.  Using the model specified above, use `lm()` to estimate all three coefficients using the `mpg` data. Make sure you are treating `year` as a categorical variable! Use `summary(lm())` to print the regression results.
 
 ```{r}
+interaction_mod <- lm(hwy ~ displ + year + displ:year, data = mpg)
+summary(interaction_mod)
+
+# treat year as a categorical variable 
+# check that it's a categoricla variable by checking the class for factor
+# order of displ and year does not matter
 ```
 
 2.  What does the intercept tell you, in words?
 
-3.  What does the coefficient on `displ` tell you, in words?
+The intercept tells us that we expect a 1999 car with no engine to have an average of 35.8 mpg.
 
-4.  What does the coefficient estimate on the 2008 vintage indicator variable (`year2008`) tell you, in words?
+2.  What does the coefficient on `displ` tell you, in words?
 
-5.  What does the coefficient on `displ:year2008` tell you, in words?[^1]
+The coefficient on displ tells us that as the engine size increases by 1 liter we expect an increase of 0.34 mpg in a 2008 car than a 1999 car.
+
+2.  What does the coefficient estimate on the 2008 vintage indicator variable (`year2008`) tell you, in words?
+
+The coefficient on year2008 tells us that the a 2008 car with no engine will have a higher mpg of 0.3445 than a 1999 car with no engine.
+
+**Big idea:** can't ever turn off beta not because the intercept is always on
+
+so it's hwy = beta not + beta 2 \* 1
+
+Think this through more: The coefficient on year2008 is the difference between mpg in a 199 car with no engine and a 2008 car with no engine
+
+2.  What does the coefficient on `displ:year2008` tell you, in words?[^1]
 
 [^1]: Hint: This is tricky. Start by writing down the relationship between miles per gallon and engine size when the car vintage is 2008. Then write the same thing for car vintage 1999. Can you see what role this coefficient plays?
+
+This is a change in a change - there will always be 2 changes
+
+Change in mpg due to 1 liter increase in engine size between a 2008 car and a 1999 car.
+
+displ is a continuous variable
+
+year is a categorical variable
+
+alt phrasing: for every 1 liter increase, there is 0.3 mpg increase in the difference between 2008 and 1999.
+
+-   so the difference is the difference in slopes! The difference in slopes is getting wider and wider.
+
+-   so every time we move over by 1 liter (displ) than the slope gap increases by 0.3 (we multiple beta 3 by 0.3)
 
 ## Plotting an interaction model
 
@@ -109,14 +143,27 @@ As usual, `ggplot2` with `geom_smooth` plotting our regression line makes this e
 Let's give it a try:
 
 ```{r}
+ggplot(data = mpg, aes(y = hwy, x = displ, color = year)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
 
 ```
+
+The 2008 line is not that much flatter but it's flatter. This is telling us the difference in slope is not that great.
 
 Note that you could also plot the same thing using `augment()` as we did above, in combination with `geom_line()`. This gives you a bit more control over what is going on, since it's not obvious in the prior approach what regression exactly `geom_smooth()` is running.
 
 First, run the interaction model. Then, use `geom_line()` to plot the regression lines using the fitted values from `augment()`.
 
 ```{r}
+# this is preffered over geom_smooth
+ggplot(data = mpg, aes(y = hwy, x = displ, color = year)) +
+  geom_point() +
+  geom_line(data = augment(x = interaction_mod), aes(y = .fitted))
+
+augment(interaction_mod)
+# augment creates a data frame that provides us with residual and fitted information 
+# know to put .fitted because of augment()
  
 ```
 
